@@ -154,6 +154,38 @@ class TkGameCanvasSprite:
     # end def
 
 
+    def get_frame_delay (self, delay, index=0):
+        """
+            hook method to be reimplemented in subclass; returns image
+            animation frame @delay (integer) in milliseconds for image
+            number @index; allows also to put lambda callables in
+            sprite's delay declarations e.g. for random delays;
+            example: STATUS = {
+                "default": {
+                    "loop": True,
+                    "sequence": True,
+                    "delay": (
+                        100, 2000, lambda: random.randint(500, 800),
+                        200, 1000,
+                    )
+                },
+            }
+        """
+        # delay is a subscriptable sequence?
+        if isinstance(delay, (tuple, list, dict)):
+            # reset value
+            delay = delay[index]
+        # end if
+        # delay is a callable?
+        if callable(delay):
+            # get integer value
+            delay = delay()
+        # end if
+        # must return an integer value (in msec)
+        return int(delay)
+    # end def
+
+
     def get_sprites_from_ids (self, list_ids, exclude=None):
         """
             retrieves registered sprites in owner's dict along with
@@ -184,12 +216,15 @@ class TkGameCanvasSprite:
             # update image
             self.canvas.itemconfigure(self.canvas_id, image=_image)
             if _status.get("sequence"):
+                # get delay
+                _delay = self.get_frame_delay(
+                    _status.get("delay"), self.state_counter
+                )
                 # next step
                 self.state_counter += 1
                 # next loop
                 self.animations.run_after(
-                    _status.get("delay") or 100,
-                    self.image_animation_loop
+                    _delay, self.image_animation_loop
                 )
             # end if
         elif self.state_counter:
