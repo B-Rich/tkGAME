@@ -166,8 +166,8 @@ class TkGameCanvasSprite:
                     "sequence": True,
                     "delay": (
                         100, 2000, lambda: random.randint(500, 800),
-                        200, 1000,
-                    )
+                        200, 1000, 300, random.choice([100, 200, 500]),
+                    ),
                 },
             }
         """
