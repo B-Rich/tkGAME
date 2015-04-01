@@ -362,6 +362,26 @@ class TkGameCanvasSprite:
     # end def
 
 
+    def on_state_changed (self, *args, **kw):
+        """
+            this is called each time self.state differs from previous
+            value; hook method to be reimplemented in subclass;
+        """
+        pass
+    # end def
+
+
+    def set_position (self, x, y):
+        """
+            sets up sprite's (x, y) absolute position on canvas;
+        """
+        # reset position
+        self.canvas.coords(self.canvas_id, x, y)
+        # reset coords
+        self.xy = (x, y)
+    # end def
+
+
     def setup (self):
         """
             sets up sprite on canvas, if not already done;
@@ -439,10 +459,12 @@ class TkGameCanvasSprite:
                 self.__state = value
                 # reset counter
                 self.state_counter = 0
+                # hook method
+                self.on_state_changed()
             # end if
             # update animation loop if started
             self.update_image_animation_loop()
-            # notify system
+            # notify app
             self.notify_event("State:Changed")
         else:
             raise TkGameSpriteError(
